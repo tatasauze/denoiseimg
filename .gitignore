@@ -1,1 +1,6 @@
 .venv
+.idx
+__pycache__
+src
+devserver.sh
+GEMINI.md

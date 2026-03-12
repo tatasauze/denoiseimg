@@ -1,7 +1,4 @@
-# Flask Web App Starter
-
-A Flask starter template as per [these docs](https://flask.palletsprojects.com/en/3.0.x/quickstart/#a-minimal-application).
-
-## Getting Started
-
-Previews should run automatically when starting a workspace.
+均值：補零
+中間值：重複（重複最外邊）
+高斯：反折
+雙邊濾波：反折
