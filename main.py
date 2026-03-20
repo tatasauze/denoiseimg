@@ -203,16 +203,22 @@ if __name__ == "__main__":
 
 
     # add noise and save as png
-    noise = [4,2,1,0.5,0.1,0.01]
-    for i in range(len(noise)):
-        noised_img = add_noise(img,0,noise[i])
-        plot_img(dir="filtered_img/noised",file_name=f"noised_{noise[i]}",img=noised_img)
-        
+    # noise = [4,2,1,0.5,0.1,0.01]
+    # for i in range(len(noise)):
+    #     noised_img = add_noise(img,0,noise[i])
+    #     plot_img(dir="filtered_img/noised",file_name=f"noised_{noise[i]}",img=noised_img)
+    #     np.save(f"filtered_img/noised/noised_{noise[i]}.npy",noised_img)
 
 
-    # load noised img
+    # load noised img and minus original img
     root_dir = 'filtered_img/noised'
     files = os.listdir(root_dir)
+    files.sort()
+    for i in files:
+        noised_img = plt.imread(os.path.join(root_dir,i))
+        minus_img = img-noised_img
+        plot_img(dir="filtered_img/minus",file_name=f"minus_{i}",img=minus_img)
+        
 
 
     # # setup imgprocessor object
