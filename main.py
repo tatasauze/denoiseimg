@@ -5,12 +5,13 @@ from numpy.lib.stride_tricks import sliding_window_view
 import matplotlib
 from HW1 import *
 
-def normal_gaussina_noise():
+def normal_gaussina_noise(seed=np.random.default_rng(64)):
     '''
     method by box muller
     Returns:
         2 normal Gaussian var.
     '''
+    seed = seed
     U1 = random.random()
     U2 = random.random()
     Z1 = np.sqrt(-2*np.log(U1))*np.cos(2*np.pi*U2)
@@ -200,6 +201,7 @@ if __name__ == "__main__":
     lena = BmpParser("filtered_img/lena.bmp")
     img = np.flipud(lena.cleaned_pixel)
 
+
     # add noise and save as png
     noise = [4,2,1,0.5,0.1,0.01]
     for i in range(len(noise)):
@@ -209,8 +211,9 @@ if __name__ == "__main__":
 
 
     # load noised img
-    # path = ''
-    # noised_img = plt.imread(path)
+    root_dir = 'filtered_img/noised'
+    files = os.listdir(root_dir)
+
 
     # # setup imgprocessor object
     # img_procssor = Image_filter(noised_img)
