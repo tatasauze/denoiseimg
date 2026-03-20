@@ -208,16 +208,26 @@ if __name__ == "__main__":
     #     noised_img = add_noise(img,0,noise[i])
     #     plot_img(dir="filtered_img/noised",file_name=f"noised_{noise[i]}",img=noised_img)
     #     np.save(f"filtered_img/noised/noised_{noise[i]}.npy",noised_img)
-
+    
+    # sigma set 40 to try extreme
+    # noised_img = add_noise(img,0,40)
+    # plot_img(dir="filtered_img/noised",file_name=f"noised_40",img=noised_img)
+    # minus_img = img-noised_img
+    # plot_img(dir="filtered_img/minus",file_name=f"minus_40",img=minus_img)
+        
 
     # load noised img and minus original img
-    root_dir = 'filtered_img/noised'
-    files = os.listdir(root_dir)
-    files.sort()
-    for i in files:
-        noised_img = plt.imread(os.path.join(root_dir,i))
-        minus_img = img-noised_img
-        plot_img(dir="filtered_img/minus",file_name=f"minus_{i}",img=minus_img)
+    # root_dir = 'filtered_img/noised'
+    # files = os.listdir(root_dir)
+    # files = [i for i in files if i.endswith('.npy')]
+    # files.sort()
+
+    # if not os.path.exists("filtered_img/minus"):
+    #     os.mkdir("filtered_img/minus")
+    # for i in files:
+    #     noised_img = np.load(os.path.join(root_dir,i))
+    #     minus_img = img-noised_img
+    #     plot_img(dir="filtered_img/minus",file_name=f"minus_{i}",img=minus_img)
         
 
 
