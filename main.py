@@ -181,33 +181,44 @@ class Image_filter:
             
         return out_img
 
+# basic plot function
+def plot_img(dir:str,file_name:str,img:np.ndarray):
+    if not os.path.exists(dir):
+        os.mkdir(dir)
+    fig = plt.figure(figsize=(8, 8), dpi=500)
+    plt.imshow(img, cmap='gray')
+    plt.title(file_name, fontsize=16)
+    plt.axis('off')
+    file_path = os.path.join(dir,file_name+'.png')
+    plt.savefig(file_path, bbox_inches='tight', pad_inches=0.1)
+    plt.show()
+    plt.close(fig)
+
 if __name__ == "__main__":
 
     # load bmp img
     lena = BmpParser("filtered_img/lena.bmp")
     img = np.flipud(lena.cleaned_pixel)
 
-    # add noise
-    noised_img = add_noise(img,mean=0,sigma=10)
+    # add noise and save as png
+    noise = [4,2,1,0.5,0.1,0.01]
+    for i in range(len(noise)):
+        noised_img = add_noise(img,0,noise[i])
+        plot_img(dir="filtered_img/noised",file_name=f"noised_{noise[i]}",img=noised_img)
+        
 
-    # setup imgprocessor object
-    img_procssor = Image_filter(noised_img)
-    out_dir = 'filtered_img'
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
 
-    # basic plot function
-    def plot_img(dir:str,file_name:str,img:np.ndarray):
-        if not os.path.exists(dir):
-            os.mkdir(dir)
-        fig = plt.figure(figsize=(8, 8), dpi=500)
-        plt.imshow(img, cmap='gray')
-        plt.title(file_name, fontsize=16)
-        plt.axis('off')
-        file_path = os.path.join(dir,file_name+'.png')
-        plt.savefig(file_path, bbox_inches='tight', pad_inches=0.1)
-        plt.show()
-        plt.close(fig)
+    # load noised img
+    # path = ''
+    # noised_img = plt.imread(path)
+
+    # # setup imgprocessor object
+    # img_procssor = Image_filter(noised_img)
+    # out_dir = 'filtered_img'
+    # if not os.path.exists(out_dir):
+    #     os.makedirs(out_dir)
+
+    
 
     # all kinds of processsor
 
@@ -235,4 +246,4 @@ if __name__ == "__main__":
                                                             distance_sigma=spacial_sigma,
                                                             range_sigma=range_sigma)    
                 plot_img(dir=out_dir,file_name=f"bilateral_G{spacial_sigma}_R_{range_sigma}",img=bilateral_img)
-    plot_bilateral()
+    #plot_bilateral()
