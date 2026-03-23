@@ -1,4 +1,3 @@
-#%%
 import random
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
@@ -9,7 +8,7 @@ def normal_gaussina_noise(seed=np.random.default_rng(64)):
     '''
     method by box muller
     Returns:
-        2 normal Gaussian var.
+        1 gaussian var.
     '''
     seed = seed
     U1 = random.random()
@@ -19,21 +18,30 @@ def normal_gaussina_noise(seed=np.random.default_rng(64)):
     return Z1
 
 
-def add_noise(img:np.ndarray,mean:int,sigma:int):
+def add_noise(img:np.ndarray, mean:int, sigma:int):
     '''
     Args:
-        img: np.ndarray
-        noise_type: str
-        mean: int
-        sigma: int
+        img: np.ndarray (grayscale or RGB)
+        mean: int  mean of gaussian noise
+        sigma: int  standard deviation of gaussian noise
     Returns:
-        img: np.ndarray dtype=np.float32
+        noise_img: np.ndarray dtype=np.float32
     '''
-    img.astype(np.float32)
+    img = img.astype(np.float32)
     mean = float(mean)
     sigma = float(sigma)
-    func = np.vectorize(lambda x:x+(mean+normal_gaussina_noise()*sigma))
-    noise_img = func(img)
+    
+    # gen. noise for each pixel and channel
+    noise = np.zeros_like(img, dtype=np.float32)
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            if len(img.shape) == 3:  # RGB
+                for k in range(img.shape[2]):
+                    noise[i, j, k] = mean + normal_gaussina_noise() * sigma
+            else:  # grayscale
+                noise[i, j] = mean + normal_gaussina_noise() * sigma
+    
+    noise_img = img + noise
     return noise_img.astype(np.float32)
 
 
@@ -183,23 +191,40 @@ class Image_filter:
         return out_img
 
 # basic plot function
-def plot_img(dir:str,file_name:str,img:np.ndarray):
+def plot_img(dir:str, file_name:str, img:np.ndarray):
     if not os.path.exists(dir):
         os.mkdir(dir)
+
+    # normalize to 0-255 for display (preserve relative contrast)
+    img_min = np.min(img)
+    img_max = np.max(img)
+    
+    if img_max - img_min > 0:
+        img_display = ((img - img_min) / (img_max - img_min) * 255).astype(np.uint8)
+    else:
+        img_display = np.zeros_like(img, dtype=np.uint8)
+    
     fig = plt.figure(figsize=(8, 8), dpi=500)
-    plt.imshow(img, cmap='gray')
+
+    # check if RGB or grayscale
+    if len(img_display.shape) == 3 and img_display.shape[2] in [3, 4]: # alpha
+        plt.imshow(img_display)
+    else:
+        plt.imshow(img_display, cmap='gray')  # grayscale
+
     plt.title(file_name, fontsize=16)
     plt.axis('off')
-    file_path = os.path.join(dir,file_name+'.png')
+    file_path = os.path.join(dir, file_name+'.png')
     plt.savefig(file_path, bbox_inches='tight', pad_inches=0.1)
     plt.show()
     plt.close(fig)
 
 if __name__ == "__main__":
 
-    # load bmp img
-    lena = BmpParser("filtered_img/lena.bmp")
-    img = np.flipud(lena.cleaned_pixel)
+    # =======================================
+    # load bmp img lena
+    # lena = BmpParser("filtered_img/lena.bmp")
+    # img = np.flipud(lena.cleaned_pixel)
 
 
     # add noise and save as png
@@ -229,7 +254,15 @@ if __name__ == "__main__":
     #     minus_img = img-noised_img
     #     plot_img(dir="filtered_img/minus",file_name=f"minus_{i}",img=minus_img)
         
-
+    # =====================================
+    # coin img
+    # add noise and save as png
+    img = plt.imread('coin_1.png')
+    noise = [4,2,1,0.5,0.1,0.01]
+    for i in range(len(noise)):
+        noised_img = add_noise(img,0,noise[i])
+        plot_img(dir="filtered_img/noised/coin",file_name=f"noised_{noise[i]}",img=noised_img)
+        np.save(f"filtered_img/noised/coin/noised_{noise[i]}.npy",noised_img)
 
     # # setup imgprocessor object
     # img_procssor = Image_filter(noised_img)
