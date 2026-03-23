@@ -316,17 +316,20 @@ if __name__ == "__main__":
     #     np.save(f"filtered_img/noised/coin/noised_{noise[i]}.npy",noised_img)
 
     # setup imgprocessor object
-    img_procssor = Image_filter(noised_img)
-    out_dir = 'filtered_img'
+    lena_noise = np.load('filtered_img/noised/noised_4.npy')
+    coin_noise = np.load('filtered_img/noised/coin/noised_0.01.npy')
+
+    img_procssor_coin = Image_filter(coin_noise)
+    out_dir = 'filtered_img/denoise_coin'
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
     # all kinds of processsor
 
-    # average_img = img_procssor.mean_val_filter(3)
-    # sobel_img = img_procssor.sobel_filter()
-    # median_img = img_procssor.median_filter(3)
-    # gaussian_img = img_procssor.gaussian_filter(kernel_size=3,sigma=5)
+    average_img = img_procssor_coin.mean_val_filter(3)
+    sobel_img = img_procssor_coin.sobel_filter()
+    median_img = img_procssor_coin.median_filter(3)
+    gaussian_img = img_procssor_coin.gaussian_filter(kernel_size=3,sigma=0.01)
     # PNG
     # images_to_save = {
     #     "noised": noised_img,
@@ -337,14 +340,16 @@ if __name__ == "__main__":
     #     "bilateral_filter": bilateral_img
     # }    
 
-    def plot_bilateral():
-        out_dir = "filtered_img/bilateral"
-        spacial_sigmas = [i for i in range(5,51,5)]
-        range_sigmas = [i for i in range(5,51,5)]
+    def plot_bilateral(dir,img_procssor):
+        spacial_sigmas = [i for i in range(1,6)]
+        range_sigmas = [i for i in range(1,6)]
         for spacial_sigma in spacial_sigmas:
             for range_sigma in range_sigmas:
                 bilateral_img = img_procssor.bilateral_filter(kernel_size=3,
                                                             distance_sigma=spacial_sigma,
                                                             range_sigma=range_sigma)    
                 plot_img(dir=out_dir,file_name=f"bilateral_G{spacial_sigma}_R_{range_sigma}",img=bilateral_img)
-    #plot_bilateral()
+    plot_img(dir=out_dir,file_name="average_filter",img=average_img)
+    plot_img(dir=out_dir,file_name="median_filter",img=median_img)
+    plot_img(dir=out_dir,file_name="gaussian_filter",img=gaussian_img)
+    plot_bilateral(dir=out_dir,img_procssor=img_procssor_coin)
