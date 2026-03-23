@@ -59,23 +59,30 @@ class Image_filter:
             out_img: np.ndarray
         '''
         img = self.img
+        
+        # check if RGB (3 channels) or grayscale
+        if len(img.shape) == 3:  # RGB
+            out_img = np.zeros_like(img)
+            for c in range(img.shape[2]):  # process each channel
+                out_img[:,:,c] = self._apply_mean_filter(img[:,:,c], kernel_size)
+            return out_img
+        else:  # grayscale
+            return self._apply_mean_filter(img, kernel_size)
+    
+    def _apply_mean_filter(self, img_2d:np.ndarray, kernel_size:int) -> np.ndarray:
+        '''apply mean filter on 2D grayscale image'''
         kernel = np.ones((kernel_size,kernel_size))
         average_scale = kernel_size**2
-        out_img = np.zeros(img.shape)
-
-        # padding with 0 on marginal
-        width = img.shape[1]
-        stride = 1
         padding = (kernel_size-1)//2
-
-        pad_img = np.pad(img,pad_width=padding,mode='constant',constant_values=0)
-        out_img = np.zeros(img.shape)
         
-        kernel = kernel/average_scale
-        for i in range(img.shape[0]):
-            for j in range(img.shape[1]):
-                window = pad_img[i:i+kernel_size,j:j+kernel_size]
-                out_img[i,j] = np.sum(window*kernel)
+        pad_img = np.pad(img_2d, pad_width=padding, mode='constant', constant_values=0)
+        out_img = np.zeros_like(img_2d)
+        
+        kernel = kernel / average_scale
+        for i in range(img_2d.shape[0]):
+            for j in range(img_2d.shape[1]):
+                window = pad_img[i:i+kernel_size, j:j+kernel_size]
+                out_img[i,j] = np.sum(window * kernel)
         return out_img
 
     def sobel_filter(self):
@@ -87,17 +94,30 @@ class Image_filter:
             img: np.ndarray
         '''
         img = self.img
+        
+        # check if RGB (3 channels) or grayscale
+        if len(img.shape) == 3:  # RGB
+            out_img = np.zeros_like(img)
+            for c in range(img.shape[2]):  # process each channel
+                out_img[:,:,c] = self._apply_sobel(img[:,:,c])
+            return out_img
+        else:  # grayscale
+            return self._apply_sobel(img)
+    
+    def _apply_sobel(self, img_2d:np.ndarray) -> np.ndarray:
+        '''apply sobel filter on 2D grayscale image'''
         kernel = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
         kernel_size = kernel.shape[0]
         pad = (kernel_size-1)//2
-        out_img = np.zeros(img.shape)
-        pad_img = np.pad(img,pad_width=pad,mode="constant",constant_values=0)
-        for i in range(img.shape[0]):
-            for j in range(img.shape[1]):
-                window = pad_img[i:i+kernel_size,j:j+kernel_size]
-                out_img[i,j] = np.sum(window*kernel)
+        
+        out_img = np.zeros_like(img_2d)
+        pad_img = np.pad(img_2d, pad_width=pad, mode="constant", constant_values=0)
+        for i in range(img_2d.shape[0]):
+            for j in range(img_2d.shape[1]):
+                window = pad_img[i:i+kernel_size, j:j+kernel_size]
+                out_img[i,j] = np.sum(window * kernel)
         return out_img
-    
+
     def median_filter(self,kernel_size:int):
         '''
         stride = 1 , same padding
@@ -108,17 +128,27 @@ class Image_filter:
             out_img: np.ndarray
         '''
         img = self.img
-        kernel = np.ones((kernel_size,kernel_size))
+        
+        # check if RGB (3 channels) or grayscale
+        if len(img.shape) == 3:  # RGB
+            out_img = np.zeros_like(img)
+            for c in range(img.shape[2]):  # process each channel
+                out_img[:,:,c] = self._apply_median(img[:,:,c], kernel_size)
+            return out_img
+        else:  # grayscale
+            return self._apply_median(img, kernel_size)
+    
+    def _apply_median(self, img_2d:np.ndarray, kernel_size:int) -> np.ndarray:
+        '''apply median filter on 2D grayscale image'''
         padding = (kernel_size-1)//2
-        out_img = np.zeros(img.shape)
+        out_img = np.zeros_like(img_2d)
         # replication padding
-        pad_img = np.pad(img,pad_width=padding,mode='edge')
-        for i in range(img.shape[0]):
-            for j in range(img.shape[1]):
-                window = pad_img[i:i+kernel_size,j:j+kernel_size]
+        pad_img = np.pad(img_2d, pad_width=padding, mode='edge')
+        for i in range(img_2d.shape[0]):
+            for j in range(img_2d.shape[1]):
+                window = pad_img[i:i+kernel_size, j:j+kernel_size]
                 out_img[i,j] = np.median(window)
         return out_img
-
 
     def gaussian_filter(self,kernel_size:int,sigma:int):
         '''
@@ -130,22 +160,33 @@ class Image_filter:
             out_img: np.ndarray
         '''
         img = self.img
-
-        #1 1-D 
-        ax = np.arange(-kernel_size//2+1,kernel_size//2+1)
-        #2 2-D
+        
+        # check if RGB (3 channels) or grayscale
+        if len(img.shape) == 3:  # RGB
+            out_img = np.zeros_like(img)
+            for c in range(img.shape[2]):  # process each channel
+                out_img[:,:,c] = self._apply_gaussian(img[:,:,c], kernel_size, sigma)
+            return out_img
+        else:  # grayscale
+            return self._apply_gaussian(img, kernel_size, sigma)
+    
+    def _apply_gaussian(self, img_2d:np.ndarray, kernel_size:int, sigma:int) -> np.ndarray:
+        '''apply gaussian filter on 2D grayscale image'''
+        # 1-D
+        ax = np.arange(-kernel_size//2+1, kernel_size//2+1)
+        # 2-D
         xx,yy = np.meshgrid(ax,ax)
-        #3 gaussian
+        # 3 gaussian kernel
         kernel = np.exp(-0.5*(np.square(xx)+np.square(yy))/np.square(sigma))
         kernel = kernel/np.sum(kernel)
-
-        pad_img = (kernel_size-1)//2
-        out_img = np.zeros(img.shape)
-        pad_img = np.pad(img,pad_width=pad_img,mode='reflect')
-        for i in range(img.shape[0]):
-            for j in range(img.shape[1]):
-                window = pad_img[i:i+kernel_size,j:j+kernel_size]
-                out_img[i,j] = np.sum(window*kernel)
+        
+        pad_size = (kernel_size-1)//2
+        out_img = np.zeros_like(img_2d)
+        pad_img = np.pad(img_2d, pad_width=pad_size, mode='reflect')
+        for i in range(img_2d.shape[0]):
+            for j in range(img_2d.shape[1]):
+                window = pad_img[i:i+kernel_size, j:j+kernel_size]
+                out_img[i,j] = np.sum(window * kernel)
         return out_img
 
     def bilateral_filter(self,kernel_size:int,distance_sigma:int,range_sigma:int):
@@ -161,33 +202,43 @@ class Image_filter:
         '''
         img = self.img
         
+        # check if RGB (3 channels) or grayscale
+        if len(img.shape) == 3:  # RGB
+            out_img = np.zeros_like(img)
+            for c in range(img.shape[2]):  # process each channel
+                out_img[:,:,c] = self._apply_bilateral(img[:,:,c], kernel_size, distance_sigma, range_sigma)
+            return out_img
+        else:  # grayscale
+            return self._apply_bilateral(img, kernel_size, distance_sigma, range_sigma)
+    
+    def _apply_bilateral(self, img_2d:np.ndarray, kernel_size:int, distance_sigma:int, range_sigma:int) -> np.ndarray:
+        '''apply bilateral filter on 2D grayscale image'''
         # gaussian filter
-        ax = np.arange(-kernel_size//2+1,kernel_size//2+1)
+        ax = np.arange(-kernel_size//2+1, kernel_size//2+1)
         xx,yy = np.meshgrid(ax,ax)
         spacial_kernel = np.exp(-0.5*(np.square(xx)+np.square(yy))/np.square(distance_sigma))
         spacial_kernel = spacial_kernel/np.sum(spacial_kernel)
-
-        # pag img reflect
+        
+        # pad img reflect
         padding = (kernel_size-1)//2
-        pad_img = np.pad(img,pad_width=padding,mode='reflect')
+        pad_img = np.pad(img_2d, pad_width=padding, mode='reflect')
         
         # outimg
-        out_img = np.zeros(img.shape)
-        for i in range(img.shape[0]):
-            for j in range(img.shape[1]):
-                
-                window = pad_img[i:i+kernel_size,j:j+kernel_size]
+        out_img = np.zeros_like(img_2d)
+        for i in range(img_2d.shape[0]):
+            for j in range(img_2d.shape[1]):
+                window = pad_img[i:i+kernel_size, j:j+kernel_size]
                 
                 # centeral coordinate 每個位置減去中心像素平方
                 center_pixel = window[padding,padding]
-                range_diff = np.square(window-center_pixel)
-
+                range_diff = np.square(window - center_pixel)
+                
                 range_kernel = np.exp(-0.5*range_diff/np.square(range_sigma))
-
-                combined_kernel = spacial_kernel*range_kernel
-                combined_kernel = combined_kernel/np.sum(combined_kernel)
-                out_img[i,j] = np.sum(window*combined_kernel)
-            
+                
+                combined_kernel = spacial_kernel * range_kernel
+                combined_kernel = combined_kernel / np.sum(combined_kernel)
+                out_img[i,j] = np.sum(window * combined_kernel)
+        
         return out_img
 
 # basic plot function
@@ -257,20 +308,18 @@ if __name__ == "__main__":
     # =====================================
     # coin img
     # add noise and save as png
-    img = plt.imread('coin_1.png')
-    noise = [4,2,1,0.5,0.1,0.01]
-    for i in range(len(noise)):
-        noised_img = add_noise(img,0,noise[i])
-        plot_img(dir="filtered_img/noised/coin",file_name=f"noised_{noise[i]}",img=noised_img)
-        np.save(f"filtered_img/noised/coin/noised_{noise[i]}.npy",noised_img)
+    # img = plt.imread('coin_1.png')
+    # noise = [4,2,1,0.5,0.1,0.01]
+    # for i in range(len(noise)):
+    #     noised_img = add_noise(img,0,noise[i])
+    #     plot_img(dir="filtered_img/noised/coin",file_name=f"noised_{noise[i]}",img=noised_img)
+    #     np.save(f"filtered_img/noised/coin/noised_{noise[i]}.npy",noised_img)
 
-    # # setup imgprocessor object
-    # img_procssor = Image_filter(noised_img)
-    # out_dir = 'filtered_img'
-    # if not os.path.exists(out_dir):
-    #     os.makedirs(out_dir)
-
-    
+    # setup imgprocessor object
+    img_procssor = Image_filter(noised_img)
+    out_dir = 'filtered_img'
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
 
     # all kinds of processsor
 
