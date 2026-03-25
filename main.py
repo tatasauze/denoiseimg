@@ -117,6 +117,111 @@ class Image_filter:
                 window = pad_img[i:i+kernel_size, j:j+kernel_size]
                 out_img[i,j] = np.sum(window * kernel)
         return out_img
+    def prewitt(self):
+        '''
+        stride = 1 , same padding
+        Args:
+            img: np.ndarray
+        Returns:
+            img: np.ndarray
+        '''
+        img = self.img
+        
+        # check if RGB (3 channels) or grayscale
+        if len(img.shape) == 3:  # RGB
+            out_img = np.zeros_like(img)
+            for c in range(img.shape[2]):  # process each channel
+                out_img[:,:,c] = self._apply_prewitt(img[:,:,c])
+            return out_img
+        else:  # grayscale
+            return self._apply_prewitt(img)
+        
+    def _apply_prewitt(self, img_2d:np.ndarray):
+        '''apply prewitt filter on 2D grayscale image'''
+        kernel_x = np.array([[-1,0,1],[-1,0,1],[-1,0,1]])
+        kernel_y = np.array([[1,1,1],[0,0,0],[-1,-1,-1]])
+        kernel_size = kernel.shape[0]
+        pad = (kernel_size-1)//2
+        
+        out_img_x = np.zeros_like(img_2d)
+        out_img_y = np.zeros_like(img_2d)
+        
+        pad_img = np.pad(img_2d, pad_width=pad, mode="constant", constant_values=0)
+        for i in range(img_2d.shape[0]):
+            for j in range(img_2d.shape[1]):
+                window = pad_img[i:i+kernel_size, j:j+kernel_size]
+                out_img_y[i,j] = np.sum(window * kernel_y)
+                out_img_x[i,j] = np.sum(window * kernel_x)
+        
+        out_img = np.sqrt(np.square(out_img_x) + np.square(out_img_y))
+        return out_img
+    
+    def derived_vertical(self):
+        '''
+        stride = 1 , same padding
+        Args:
+            img: np.ndarray
+        Returns:
+            img: np.ndarray
+        '''
+        img = self.img
+        
+        # check if RGB (3 channels) or grayscale
+        if len(img.shape) == 3:  # RGB
+            out_img = np.zeros_like(img)
+            for c in range(img.shape[2]):  # process each channel
+                out_img[:,:,c] = self._apply_derived_vertical(img[:,:,c])
+            return out_img
+        else:  # grayscale
+            return self._apply_derived_vertical(img)
+    
+    def _apply_derived_vertical(self, img_2d:np.ndarray) -> np.ndarray:
+        '''apply sobel filter on 2D grayscale image'''
+        kernel = np.array([[0,0,0],[-1,1,0],[0,0,0]])
+        kernel_size = kernel.shape[0]
+        pad = (kernel_size-1)//2
+        
+        out_img = np.zeros_like(img_2d)
+        pad_img = np.pad(img_2d, pad_width=pad, mode="constant", constant_values=0)
+        for i in range(img_2d.shape[0]):
+            for j in range(img_2d.shape[1]):
+                window = pad_img[i:i+kernel_size, j:j+kernel_size]
+                out_img[i,j] = np.sum(window * kernel)
+        return out_img
+
+    def derived_horizental(self):
+        '''
+        stride = 1 , same padding
+        Args:
+            img: np.ndarray
+        Returns:
+            img: np.ndarray
+        '''
+        img = self.img
+        
+        # check if RGB (3 channels) or grayscale
+        if len(img.shape) == 3:  # RGB
+            out_img = np.zeros_like(img)
+            for c in range(img.shape[2]):  # process each channel
+                out_img[:,:,c] = self._apply_derived_horizental(img[:,:,c])
+            return out_img
+        else:  # grayscale
+            return self._apply_derived_horizental(img)
+    
+    def _apply_derived_horizental(self, img_2d:np.ndarray) -> np.ndarray:
+        '''apply sobel filter on 2D grayscale image'''
+        kernel = np.array([[0,1,0],[0,-1,0],[0,0,0]])
+        kernel_size = kernel.shape[0]
+        pad = (kernel_size-1)//2
+        
+        out_img = np.zeros_like(img_2d)
+        pad_img = np.pad(img_2d, pad_width=pad, mode="constant", constant_values=0)
+        for i in range(img_2d.shape[0]):
+            for j in range(img_2d.shape[1]):
+                window = pad_img[i:i+kernel_size, j:j+kernel_size]
+                out_img[i,j] = np.sum(window * kernel)
+        return out_img
+
 
     def median_filter(self,kernel_size:int):
         '''
