@@ -455,8 +455,8 @@ if __name__ == "__main__":
     # }    
 
     def plot_bilateral(dir,img_procssor):
-        spacial_sigmas = [i for i in range(1,6,5)]
-        range_sigmas = [i for i in range(1,6,5)]
+        spacial_sigmas = [i for i in range(1,6)]
+        range_sigmas = [i for i in range(1,6)]
         for spacial_sigma in spacial_sigmas:
             for range_sigma in range_sigmas:
                 bilateral_img = img_procssor.bilateral_filter(kernel_size=3,
@@ -468,3 +468,60 @@ if __name__ == "__main__":
     plot_img(dir=out_dir,file_name="median_filter",img=median_img)
     plot_img(dir=out_dir,file_name="gaussian_filter",img=gaussian_img)
     plot_bilateral(dir=out_dir,img_procssor=img_procssor_coin)
+
+    #edge detection
+    # setup imgprocessor object
+    lena_noise_average = np.load('filtered_img/denoise_lena/average_filter.npy')
+    lena_noise_gaussian = np.load('filtered_img/denoise_lena/gaussian_filter.npy')
+    lena_noise_median = np.load('filtered_img/denoise_lena/median_filter.npy')
+    lena_noise_b_G1_R1 = np.load('filtered_img/denoise_lena/bilateral_G1_R_1.npy')
+    lena_noise_b_G5_R5 = np.load('filtered_img/denoise_lena/bilateral_G5_R_5.npy')
+
+    
+    coin_noise_average = np.load('filtered_img/denoise_lena/average_filter.npy')
+    coin_noise_gaussian = np.load('filtered_img/denoise_lena/gaussian_filter.npy')
+    coin_noise_median = np.load('filtered_img/denoise_lena/median_filter.npy')
+    coin_noise_b_G1_R1 = np.load('filtered_img/denoise_lena/bilateral_G1_R_1.npy')
+    coin_noise_b_G5_R5 = np.load('filtered_img/denoise_lena/bilateral_G5_R_5.npy')
+
+    for lena_noise,name in zip([lena_noise_average,lena_noise_gaussian,lena_noise_median,lena_noise_b_G1_R1,lena_noise],['average','gaussian','median','bilateral_G1_R1','bilateral_G5_R5']):
+        img_processor = Image_filter(lena_noise)
+
+        # edge detection
+        derived_vertical_img = img_processor.derived_vertical()
+        derived_horizental_img = img_processor.derived_horizental()
+        sobel_img = img_processor.sobel_filter()
+        prewitt_img = img_processor.prewitt()
+
+        out_dir = 'filtered_img/edge_detection_lena'
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+        na.save(f"{out_dir}/{name}_derived_vertical.npy",derived_vertical_img)
+        plot_img(dir=out_dir,file_name=f"{name}_derived_vertical",img=derived_vertical_img)
+        na.save(f"{out_dir}/{name}_derived_horizental.npy",derived_horizental_img)
+        plot_img(dir=out_dir,file_name=f"{name}_derived_horizental",img=derived_horizental)
+        na.save(f"{out_dir}/{name}_sobel.npy",sobel_img)
+        plot_img(dir=out_dir,file_name=f"{name}_sobel",img=sobel_img)
+        na.save(f"{out_dir}/{name}_prewitt.npy",prewitt_img)
+        plot_img(dir=out_dir,file_name=f"{name}_prewitt",img=prewitt)
+
+    for coin_noise,name in zip([coin_noise_average,coin_noise_gaussian,coin_noise_median,coin_noise_b_G1_R1,coin_noise_b_G5_R5],['average','gaussian','median','bilateral_G1_R1','bilateral_G5_R']):
+        img_processor = Image_filter(coin_noise)
+
+        # edge detection
+        derived_vertical_img = img_processor.derived_vertical()
+        derived_horizental_img = img_processor.derived_horizental()
+        sobel_img = img_processor.sobel_filter()
+        prewitt_img = img_processor.prewitt()
+
+        out_dir = 'filtered_img/edge_detection_coin'
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+        na.save(f"{out_dir}/{name}_derived_vertical.npy",derived_vertical_img)
+        plot_img(dir=out_dir,file_name=f"{name}_derived_vertical",img=derived_vertical_img)
+        na.save(f"{out_dir}/{name}_derived_horizental.npy",derived_horizental_img)
+        plot_img(dir=out_dir,file_name=f"{name}_derived_horizental",img=derived_horizental)
+        na.save(f"{out_dir}/{name}_sobel.npy",sobel_img)
+        plot_img(dir=out_dir,file_name=f"{name}_sobel",img=sobel_img)
+        na.save(f"{out_dir}/{name}_prewitt.npy",prewitt_img)
+        plot_img(dir=out_dir,file_name=f"{name}_prewitt",img=prewitt)
