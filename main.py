@@ -319,17 +319,26 @@ if __name__ == "__main__":
     lena_noise = np.load('filtered_img/noised/noised_4.npy')
     coin_noise = np.load('filtered_img/noised/coin/noised_0.01.npy')
 
+    img_procssor_lena = Image_filter(lena_noise)
     img_procssor_coin = Image_filter(coin_noise)
-    out_dir = 'filtered_img/denoise_coin'
+    out_dir = 'filtered_img/denoise_lena'
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
     # all kinds of processsor
+    img_procssor = img_procssor_lena
+    average_img = img_procssor.mean_val_filter(3)
+    sobel_img = img_procssor.sobel_filter()
+    median_img = img_procssor.median_filter(3)
+    gaussian_img = img_procssor.gaussian_filter(kernel_size=3,sigma=0.01)
+    
+    # save as np
+    np.save(f"{out_dir}/average_filter.npy",average_img)
+    np.save(f"{out_dir}/sobel_filter.npy",sobel_img)
+    np.save(f"{out_dir}/median_filter.npy",median_img)
+    np.save(f"{out_dir}/gaussian_filter.npy",gaussian_img)
 
-    average_img = img_procssor_coin.mean_val_filter(3)
-    sobel_img = img_procssor_coin.sobel_filter()
-    median_img = img_procssor_coin.median_filter(3)
-    gaussian_img = img_procssor_coin.gaussian_filter(kernel_size=3,sigma=0.01)
+
     # PNG
     # images_to_save = {
     #     "noised": noised_img,
@@ -341,13 +350,14 @@ if __name__ == "__main__":
     # }    
 
     def plot_bilateral(dir,img_procssor):
-        spacial_sigmas = [i for i in range(1,6)]
-        range_sigmas = [i for i in range(1,6)]
+        spacial_sigmas = [i for i in range(1,6,5)]
+        range_sigmas = [i for i in range(1,6,5)]
         for spacial_sigma in spacial_sigmas:
             for range_sigma in range_sigmas:
                 bilateral_img = img_procssor.bilateral_filter(kernel_size=3,
                                                             distance_sigma=spacial_sigma,
-                                                            range_sigma=range_sigma)    
+                                                            range_sigma=range_sigma)
+                np.save(f"{dir}/bilateral_G{spacial_sigma}_R_{range_sigma}.npy",bilateral_img) 
                 plot_img(dir=out_dir,file_name=f"bilateral_G{spacial_sigma}_R_{range_sigma}",img=bilateral_img)
     plot_img(dir=out_dir,file_name="average_filter",img=average_img)
     plot_img(dir=out_dir,file_name="median_filter",img=median_img)
