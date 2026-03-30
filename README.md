@@ -1,5 +1,8 @@
 ### 檔位位置
 
+#### codes
+[python codes main.py](./main.py)
+
 #### part1 imgs
 [Part 1 產生的噪音圖片](./filtered_img/noise/)
 
