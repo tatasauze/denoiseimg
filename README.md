@@ -1,7 +1,16 @@
-均值：補零
-中間值：重複（重複最外邊）
-高斯：反折
-雙邊濾波：反折
+### 檔位位置
+
+#### part1 imgs
+[Part 1 產生的噪音圖片](./filtered_img/noise/)
+
+#### part2 imgs
+[Part 2 濾波後的圖片](./filtered_img/)
+
+#### report1
+[報告一](./part1_report.md)
+
+#### report2
+[報告二](./part2_report.md)
 
 
 [Part-1] Denoise via spatial filtering
