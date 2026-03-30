@@ -413,35 +413,37 @@ if __name__ == "__main__":
     # =====================================
     # coin img
     # add noise and save as png
-    # img = plt.imread('coin_1.png')
-    # noise = [4,2,1,0.5,0.1,0.01]
-    # for i in range(len(noise)):
-    #     noised_img = add_noise(img,0,noise[i])
-    #     plot_img(dir="filtered_img/noised/coin",file_name=f"noised_{noise[i]}",img=noised_img)
-    #     np.save(f"filtered_img/noised/coin/noised_{noise[i]}.npy",noised_img)
+    # 將原始 RGB 資料轉換為灰階影像，使用公式 Gray = (R + B + G) / 3。  
+    img = plt.imread('filtered_img/coin_1.png')
+    gray_channel_img = np.mean(img,axis=2)
+    noise = [4,2,1,0.5,0.1,0.01]
+    for i in range(len(noise)):
+        noised_img = add_noise(img,0,noise[i])
+        plot_img(dir="filtered_img/noised/coin_graylevel",file_name=f"noised_{noise[i]}",img=noised_img)
+        np.save(f"filtered_img/noised/coin_graylevel/noised_{noise[i]}.npy",noised_img)
 
     # setup imgprocessor object
-    # lena_noise = np.load('filtered_img/noised/noised_4.npy')
-    # coin_noise = np.load('filtered_img/noised/coin/noised_0.01.npy')
+    lena_noise = np.load('filtered_img/noised/noised_4.npy')
+    coin_noise = np.load('filtered_img/noised/coin_graylevel/noised_0.01.npy')
 
-    # img_procssor_lena = Image_filter(lena_noise)
-    # img_procssor_coin = Image_filter(coin_noise)
-    # out_dir = 'filtered_img/denoise_coin'
-    # if not os.path.exists(out_dir):
-    #     os.makedirs(out_dir)
+    img_procssor_lena = Image_filter(lena_noise)
+    img_procssor_coin = Image_filter(coin_noise)
+    out_dir = 'filtered_img/denoise_coin_graylevel'
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
 
     # all kinds of processsor
-    # img_procssor = img_procssor_lena
-    # average_img = img_procssor.mean_val_filter(3)
-    # sobel_img = img_procssor.sobel_filter()
-    # median_img = img_procssor.median_filter(3)
-    # gaussian_img = img_procssor.gaussian_filter(kernel_size=3,sigma=0.01)
+    img_procssor = img_procssor_coin
+    average_img = img_procssor.mean_val_filter(3)
+    sobel_img = img_procssor.sobel_filter()
+    median_img = img_procssor.median_filter(3)
+    gaussian_img = img_procssor.gaussian_filter(kernel_size=3,sigma=0.01)
     
-    # # save as np
-    # np.save(f"{out_dir}/average_filter.npy",average_img)
-    # np.save(f"{out_dir}/sobel_filter.npy",sobel_img)
-    # np.save(f"{out_dir}/median_filter.npy",median_img)
-    # np.save(f"{out_dir}/gaussian_filter.npy",gaussian_img)
+    # save as np
+    np.save(f"{out_dir}/average_filter.npy",average_img)
+    np.save(f"{out_dir}/sobel_filter.npy",sobel_img)
+    np.save(f"{out_dir}/median_filter.npy",median_img)
+    np.save(f"{out_dir}/gaussian_filter.npy",gaussian_img)
 
 
     # PNG
@@ -464,10 +466,10 @@ if __name__ == "__main__":
                                                             range_sigma=range_sigma)
                 np.save(f"{dir}/bilateral_G{spacial_sigma}_R_{range_sigma}.npy",bilateral_img) 
                 plot_img(dir=out_dir,file_name=f"bilateral_G{spacial_sigma}_R_{range_sigma}",img=bilateral_img)
-    # plot_img(dir=out_dir,file_name="average_filter",img=average_img)
-    # plot_img(dir=out_dir,file_name="median_filter",img=median_img)
-    # plot_img(dir=out_dir,file_name="gaussian_filter",img=gaussian_img)
-    # plot_bilateral(dir=out_dir,img_procssor=img_procssor_coin)
+    plot_img(dir=out_dir,file_name="average_filter",img=average_img)
+    plot_img(dir=out_dir,file_name="median_filter",img=median_img)
+    plot_img(dir=out_dir,file_name="gaussian_filter",img=gaussian_img)
+    plot_bilateral(dir=out_dir,img_procssor=img_procssor_coin)
 
     #edge detection
     # setup imgprocessor object
@@ -478,11 +480,11 @@ if __name__ == "__main__":
     # lena_noise_b_G5_R5 = np.load('filtered_img/denoise_lena/bilateral_G5_R_5.npy')
 
     
-    # coin_noise_average = np.load('filtered_img/denoise_coin/average_filter.npy')
-    # coin_noise_gaussian = np.load('filtered_img/denoise_coin/gaussian_filter.npy')
-    # coin_noise_median = np.load('filtered_img/denoise_coin/median_filter.npy')
-    # coin_noise_b_G1_R1 = np.load('filtered_img/denoise_coin/bilateral_G1_R_1.npy')
-    # coin_noise_b_G5_R5 = np.load('filtered_img/denoise_coin/bilateral_G5_R_5.npy')
+    coin_noise_average = np.load('filtered_img/denoise_coin_graylevel/average_filter.npy')
+    coin_noise_gaussian = np.load('filtered_img/denoise_coin_graylevel/gaussian_filter.npy')
+    coin_noise_median = np.load('filtered_img/denoise_coin_graylevel/median_filter.npy')
+    coin_noise_b_G1_R1 = np.load('filtered_img/denoise_coin_graylevel/bilateral_G1_R_1.npy')
+    coin_noise_b_G5_R5 = np.load('filtered_img/denoise_coin_graylevel/bilateral_G5_R_5.npy')
 
     # for lena_noise,name in zip([lena_noise_average,lena_noise_gaussian,lena_noise_median,lena_noise_b_G1_R1,lena_noise_b_G5_R5],['average','gaussian','median','bilateral_G1_R1','bilateral_G5_R5']):
     #     img_processor = Image_filter(lena_noise)
@@ -505,48 +507,48 @@ if __name__ == "__main__":
     #     np.save(f"{out_dir}/{name}_prewitt.npy",prewitt_img)
     #     plot_img(dir=out_dir,file_name=f"{name}_prewitt",img=prewitt_img)
 
-    # for coin_noise,name in zip([coin_noise_average,coin_noise_gaussian,coin_noise_median,coin_noise_b_G1_R1,coin_noise_b_G5_R5],['average','gaussian','median','bilateral_G1_R1','bilateral_G5_R5']):
-    #     img_processor = Image_filter(coin_noise)
+    for coin_noise,name in zip([coin_noise_average,coin_noise_gaussian,coin_noise_median,coin_noise_b_G1_R1,coin_noise_b_G5_R5],['average','gaussian','median','bilateral_G1_R1','bilateral_G5_R5']):
+        img_processor = Image_filter(coin_noise)
 
-    #     # edge detection
-    #     derived_vertical_img = img_processor.derived_vertical()
-    #     derived_horizental_img = img_processor.derived_horizental()
-    #     sobel_img = img_processor.sobel_filter()
-    #     prewitt_img = img_processor.prewitt()
+        # edge detection
+        derived_vertical_img = img_processor.derived_vertical()
+        derived_horizental_img = img_processor.derived_horizental()
+        sobel_img = img_processor.sobel_filter()
+        prewitt_img = img_processor.prewitt()
 
-    #     out_dir = 'filtered_img/edge_detection_coin'
-    #     if not os.path.exists(out_dir):
-    #         os.makedirs(out_dir)
-    #     np.save(f"{out_dir}/{name}_derived_vertical.npy",derived_vertical_img)
-    #     plot_img(dir=out_dir,file_name=f"{name}_derived_vertical",img=derived_vertical_img)
-    #     np.save(f"{out_dir}/{name}_derived_horizental.npy",derived_horizental_img)
-    #     plot_img(dir=out_dir,file_name=f"{name}_derived_horizental",img=derived_horizental_img)
-    #     np.save(f"{out_dir}/{name}_sobel.npy",sobel_img)
-    #     plot_img(dir=out_dir,file_name=f"{name}_sobel",img=sobel_img)
-    #     np.save(f"{out_dir}/{name}_prewitt.npy",prewitt_img)
-    #     plot_img(dir=out_dir,file_name=f"{name}_prewitt",img=prewitt_img)
+        out_dir = 'filtered_img/edge_detection_graylevel_coin'
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+        np.save(f"{out_dir}/{name}_derived_vertical.npy",derived_vertical_img)
+        plot_img(dir=out_dir,file_name=f"{name}_derived_vertical",img=derived_vertical_img)
+        np.save(f"{out_dir}/{name}_derived_horizental.npy",derived_horizental_img)
+        plot_img(dir=out_dir,file_name=f"{name}_derived_horizental",img=derived_horizental_img)
+        np.save(f"{out_dir}/{name}_sobel.npy",sobel_img)
+        plot_img(dir=out_dir,file_name=f"{name}_sobel",img=sobel_img)
+        np.save(f"{out_dir}/{name}_prewitt.npy",prewitt_img)
+        plot_img(dir=out_dir,file_name=f"{name}_prewitt",img=prewitt_img)
 
     # original img edge detection
-    lena = BmpParser("filtered_img/lena.bmp")
-    lena = np.flipud(lena.cleaned_pixel)
+    # lena = BmpParser("filtered_img/lena.bmp")
+    # lena = np.flipud(lena.cleaned_pixel)
 
-    coin = plt.imread('filtered_img/coin_1.png')
+    # coin = plt.imread('filtered_img/coin_1.png')
 
-    dir = 'filtered_img/edge_detection_original'
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    img_processor_lena = Image_filter(lena)
-    img_processor_coin = Image_filter(coin)
-    for img,name in zip([img_processor_lena,img_processor_coin],['lena','coin']):
-        derived_vertical_img = img.derived_horizental()
-        derived_horizental_img = img.derived_vertical()
-        sobel_img = img.sobel_filter()
-        prewitt_img = img.prewitt()
-        np.save(f"{dir}/{name}_derived_vertical.npy",derived_vertical_img)
-        np.save(f"{dir}/{name}_derived_horizental.npy",derived_horizental_img)
-        np.save(f"{dir}/{name}_sobel.npy",sobel_img)
-        np.save(f"{dir}/{name}_prewitt.npy",prewitt_img)
-        plot_img(dir=dir,file_name=f"{name}_derived_vertical",img=derived_vertical_img)
-        plot_img(dir=dir,file_name=f"{name}_derived_horizental",img=derived_horizental_img)
-        plot_img(dir=dir,file_name=f"{name}_sobel",img=sobel_img)
-        plot_img(dir=dir,file_name=f"{name}_prewitt",img=prewitt_img)
+    # dir = 'filtered_img/edge_detection_original'
+    # if not os.path.exists(dir):
+    #     os.makedirs(dir)
+    # img_processor_lena = Image_filter(lena)
+    # img_processor_coin = Image_filter(coin)
+    # for img,name in zip([img_processor_lena,img_processor_coin],['lena','coin']):
+    #     derived_vertical_img = img.derived_horizental()
+    #     derived_horizental_img = img.derived_vertical()
+    #     sobel_img = img.sobel_filter()
+    #     prewitt_img = img.prewitt()
+    #     np.save(f"{dir}/{name}_derived_vertical.npy",derived_vertical_img)
+    #     np.save(f"{dir}/{name}_derived_horizental.npy",derived_horizental_img)
+    #     np.save(f"{dir}/{name}_sobel.npy",sobel_img)
+    #     np.save(f"{dir}/{name}_prewitt.npy",prewitt_img)
+    #     plot_img(dir=dir,file_name=f"{name}_derived_vertical",img=derived_vertical_img)
+    #     plot_img(dir=dir,file_name=f"{name}_derived_horizental",img=derived_horizental_img)
+    #     plot_img(dir=dir,file_name=f"{name}_sobel",img=sobel_img)
+    #     plot_img(dir=dir,file_name=f"{name}_prewitt",img=prewitt_img)
