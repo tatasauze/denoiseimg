@@ -4,7 +4,7 @@
 [python codes main.py](./main.py)
 
 #### part1 imgs
-[Part 1 產生的噪音圖片](./filtered_img/noise/)
+[Part 1 產生的噪音圖片](./filtered_img/noised/)
 
 #### part2 imgs
 [Part 2 濾波後的圖片](./filtered_img/)
