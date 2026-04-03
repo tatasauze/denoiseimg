@@ -354,7 +354,7 @@ def plot_img(dir:str, file_name:str, img:np.ndarray):
     # normalize to 0-255 for display (preserve relative contrast)
     img_min = np.min(img)
     img_max = np.max(img)
-    
+
     if img_max - img_min > 0:
         img_display = ((img - img_min) / (img_max - img_min) * 255).astype(np.uint8)
     else:
@@ -413,20 +413,25 @@ if __name__ == "__main__":
     # =====================================
     # coin img
     # add noise and save as png
-    # 將原始 RGB 資料轉換為灰階影像，使用公式 Gray = (R + B + G) / 3。  
+    # 將原始 RGB 資料轉換為灰階影像，使用公式 Gray = (R + B + G) / 3。
     img = plt.imread('filtered_img/coin_1.png')
-    gray_channel_img = np.mean(img,axis=2)
+    # Convert RGBA to grayscale (0-255 range)
+    if len(img.shape) == 3 and img.shape[2] in [3, 4]:
+        img_gray = np.mean(img[:,:,:3], axis=2) * 255.0
+    else:
+        img_gray = img * 255.0
+    
     noise = [4,2,1,0.5,0.1,0.01]
     for i in range(len(noise)):
-        noised_img = add_noise(img,0,noise[i])
+        noised_img = add_noise(img_gray, 0, noise[i])
         plot_img(dir="filtered_img/noised/coin_graylevel",file_name=f"noised_{noise[i]}",img=noised_img)
         np.save(f"filtered_img/noised/coin_graylevel/noised_{noise[i]}.npy",noised_img)
 
     # setup imgprocessor object
-    lena_noise = np.load('filtered_img/noised/noised_4.npy')
+    # lena_noise = np.load('filtered_img/noised/noised_4.npy')
     coin_noise = np.load('filtered_img/noised/coin_graylevel/noised_0.01.npy')
 
-    img_procssor_lena = Image_filter(lena_noise)
+    # img_procssor_lena = Image_filter(lena_noise)
     img_procssor_coin = Image_filter(coin_noise)
     out_dir = 'filtered_img/denoise_coin_graylevel'
     if not os.path.exists(out_dir):
@@ -469,7 +474,7 @@ if __name__ == "__main__":
     plot_img(dir=out_dir,file_name="average_filter",img=average_img)
     plot_img(dir=out_dir,file_name="median_filter",img=median_img)
     plot_img(dir=out_dir,file_name="gaussian_filter",img=gaussian_img)
-    plot_bilateral(dir=out_dir,img_procssor=img_procssor_coin)
+    # plot_bilateral(dir=out_dir,img_procssor=img_procssor_coin)
 
     #edge detection
     # setup imgprocessor object
